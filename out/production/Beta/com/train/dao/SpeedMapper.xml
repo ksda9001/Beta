@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--        Copyright© 2021 谈翰文-->
+
+<!--        This program is free software: you can redistribute it and/or modify-->
+<!--        it under the terms of the GNU General Public License as published by-->
+<!--        the Free Software Foundation, either version 3 of the License, or-->
+<!--        (at your option) any later version.-->
+
+<!--        This program is distributed in the hope that it will be useful,-->
+<!--        but WITHOUT ANY WARRANTY; without even the implied warranty of-->
+<!--        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the-->
+<!--        GNU General Public License for more details.-->
+
+<!--        You should have received a copy of the GNU General Public License-->
+<!--        along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.dao.SpeedMapper">
+
+    <select id="querySpeedById" parameterType="speed" resultType="speed">
+        select * from speed where clazzId=#{clazzId} and customerId=#{customerId}
+    </select>
+
+    <insert id="addSpeedInfo" parameterType="speed">
+        INSERT into speed(customerId,clazzId,speed) values (#{customerId}, #{clazzId},#{speed})
+    </insert>
+
+    <update id="updateSpeedInfo" parameterType="speed">
+        update speed set speed=#{speed} where customerId= #{customerId} and clazzId= #{clazzId}
+    </update>
+
+    <delete id="deleteSpeedInfoById" parameterType="String">
+        delete from speed where id=#{id}
+    </delete>
+
+    <select id="findByPage" parameterType="map" resultMap="BaseResultMap">
+        select * from speed
+        LEFT JOIN customer ON customer.customerId = speed.customerId
+        LEFT JOIN clazz ON speed.clazzId = clazz.clazzId
+        <where>
+            <if test="id!=null and id!='' ">
+                speed.customerId like "%"#{id}"%"
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+
+    </select>
+
+    <resultMap id="BaseResultMap"  type="speed">
+        <id column="id" property="id"/>
+        <result column="customerId" property="customerId"/>
+        <result column="clazzId" property="clazzId"/>
+        <result column="speed" property="speed"  />
+        <association property="customer" javaType="customer">
+            <id column="customerId" property="customerId" jdbcType="VARCHAR" />
+            <result column="customerName" property="customerName" jdbcType="VARCHAR" />
+            <result column="customerSex" property="customerSex" jdbcType="VARCHAR" />
+            <result column="customerAge" property="customerAge" jdbcType="VARCHAR" />
+            <result column="customerBifthday" property="customerBifthday" jdbcType="VARCHAR" />
+            <result column="customerDept" property="customerDept" jdbcType="VARCHAR" />
+            <result column="customerMajor" property="customerMajor" jdbcType="VARCHAR" />
+            <result column="customerClassId" property="customerClassId" jdbcType="VARCHAR" />
+            <result column="customerCellPhone" property="customerCellPhone" jdbcType="VARCHAR" />
+        </association>
+        <association property="clazz" javaType="clazz">
+            <id column="id" property="id" jdbcType="VARCHAR" />
+            <result column="clazzId" property="clazzId" jdbcType="VARCHAR" />
+            <result column="clazzName" property="clazzName" jdbcType="VARCHAR" />
+            <result column="buyYear" property="buyYear" jdbcType="VARCHAR" />
+            <result column="teacher" property="teacher" jdbcType="VARCHAR" />
+            <result column="selectHour" property="selectHour" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
+    <!-- 查询车速记录总数 -->
+    <select id="selectCount" parameterType="String" resultType="int">
+        <!-- select count(*) from speed,customer,clazz where speed.clazzId=clazz.clazzId and customer.customerId = speed.customerId -->
+        select count(*) from speed
+        LEFT JOIN customer ON customer.customerId = speed.customerId
+        LEFT JOIN clazz ON speed.clazzId = clazz.clazzId
+        <where>
+            <if test="id!=null and id!=''">
+                speed.customerId like "%"#{id}"%"
+            </if>
+        </where>
+    </select>
+
+</mapper>

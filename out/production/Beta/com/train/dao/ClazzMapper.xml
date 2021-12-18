@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--        Copyright© 2021 谈翰文-->
+
+<!--        This program is free software: you can redistribute it and/or modify-->
+<!--        it under the terms of the GNU General Public License as published by-->
+<!--        the Free Software Foundation, either version 3 of the License, or-->
+<!--        (at your option) any later version.-->
+
+<!--        This program is distributed in the hope that it will be useful,-->
+<!--        but WITHOUT ANY WARRANTY; without even the implied warranty of-->
+<!--        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the-->
+<!--        GNU General Public License for more details.-->
+
+<!--        You should have received a copy of the GNU General Public License-->
+<!--        along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.dao.ClazzMapper">
+
+    <resultMap id="BaseResultMap"  type="clazz">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="clazzId" property="clazzId" jdbcType="VARCHAR" />
+        <result column="clazzName" property="clazzName" jdbcType="VARCHAR" />
+        <result column="buyYear" property="buyYear" jdbcType="VARCHAR" />
+        <result column="driver" property="driver" jdbcType="VARCHAR" />
+        <result column="selectHour" property="selectHour" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryClazzById" parameterType="String"
+            resultType="clazz">
+        select * from clazz where clazzId=#{clazzId}
+    </select>
+
+    <insert id="addClazzInfo" parameterType="clazz">
+        INSERT into clazz(clazzId,clazzName,buyYear,driver,selectHour) values (#{clazzId}, #{clazzName},#{buyYear},#{driver},#{selectHour})
+    </insert>
+
+    <update id="updateClazzInfo" parameterType="clazz">
+        update clazz set clazzName=#{clazzName},buyYear=#{buyYear},driver=#{driver},selectHour=#{selectHour} where clazzId= #{clazzId}
+    </update>
+
+    <delete id="deleteClazzInfoById" parameterType="String">
+        delete from clazz where clazzId=#{clazzId}
+    </delete>
+
+    <!-- 查询等级信息（根据分页数据start 和size查询数据） -->
+    <select id="findByPage" parameterType="Map" resultMap="BaseResultMap">
+        select * from clazz
+        <where>
+            <if test="clazzId!=null and clazzId!='' ">
+                clazzId like "%"#{clazzId}"%"
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <!-- 查询等级记录总数 -->
+    <select id="selectCount" parameterType="String" resultType="int">
+        select count(*) from clazz
+        <where>
+            <if test="clazzId!=null and clazzId!='' ">
+                clazzId like "%"#{clazzId}"%"
+            </if>
+        </where>
+    </select>
+
+    <select id="selectcount" parameterType="String" resultType="int">
+        select count(*) from clazz ,speed WHERE speed.clazzId=clazz.clazzId AND speed.customerId=#{id}
+    </select>
+
+    <select id="query" parameterType="String" resultType="clazz">
+        SELECT
+        clazz.clazzId,
+        clazz.clazzName,
+        clazz.selectHour,
+        clazz.buyYear,
+        clazz.driver
+        FROM
+        speed,clazz
+        WHERE
+        speed.clazzId=clazz.clazzId
+        AND
+        speed.customerId=#{id}
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+
+    </select>
+
+    <select id="query1" parameterType="String" resultType="Clazz">
+        select * from clazz where clazzId=#{id}
+    </select>
+
+</mapper>
